@@ -1,6 +1,6 @@
 # 🧠 8-Week SQL Challenge
 
-> An original, business-driven SQL portfolio exploring real-world datasets through data analysis, problem-solving, and actionable insights.
+> A business-driven SQL portfolio exploring real-world datasets through data analysis, problem-solving, and actionable insights.
 
 [![SQL Server](https://img.shields.io/badge/SQL%20Server-T--SQL-CC2927?logo=microsoftsqlserver&logoColor=white)](https://learn.microsoft.com/en-us/sql/sql-server/)
 ![Case Studies](https://img.shields.io/badge/Case%20Studies-8-blue)

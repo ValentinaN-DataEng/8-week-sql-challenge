@@ -2,7 +2,6 @@
 Week 1: Customer Analytics
 File: 02_customer_analysis.sql
 Dataset: UCI Online Retail
-Purpose: ____
 */
 
 USE Portfolio_SQL_Challenges;

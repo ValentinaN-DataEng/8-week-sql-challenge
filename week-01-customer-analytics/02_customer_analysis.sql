@@ -115,25 +115,3 @@ SELECT TOP (10)
 	1.0 * Total_Net_Revenue / NULLIF(Total_Orders,0) AS Average_Net_Revenue_Per_Order
 FROM transaction_value
 ORDER BY Total_Net_Revenue DESC;
-
-
--- Week 1 — Final data quality validation
-SELECT
-    SUM(CASE
-        WHEN NULLIF(TRIM(Quantity), '') IS NOT NULL
-         AND TRY_CAST(Quantity AS INT) IS NULL
-        THEN 1 ELSE 0
-    END) AS Invalid_Quantity,
-
-    SUM(CASE
-        WHEN NULLIF(TRIM(UnitPrice), '') IS NOT NULL
-         AND TRY_CAST(REPLACE(UnitPrice, ',', '.') AS DECIMAL(10,2)) IS NULL
-        THEN 1 ELSE 0
-    END) AS Invalid_UnitPrice,
-
-    SUM(CASE
-        WHEN NULLIF(TRIM(InvoiceDate), '') IS NOT NULL
-         AND TRY_CONVERT(DATETIME, InvoiceDate, 103) IS NULL
-        THEN 1 ELSE 0
-    END) AS Invalid_InvoiceDate
-FROM dbo.OnlineRetail_Raw;

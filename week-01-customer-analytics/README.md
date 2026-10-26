@@ -29,7 +29,7 @@ An online retailer wants to better understand its customers and identify purchas
 
 The retailer has transaction-level data, but raw transactions alone do not reveal which customers contribute the most transaction value, how negative transactions affect totals, or whether purchasing frequency is associated with customer value.
 
-**Your mission:** Transform raw retail transactions into customer-level metrics and evidence-based business insights using SQL.
+**Mission:** Transform raw retail transactions into customer-level metrics and evidence-based business insights using SQL.
 
 ## 🗂️ Dataset Overview
 

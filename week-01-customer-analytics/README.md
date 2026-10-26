@@ -19,16 +19,17 @@
 - [Data Quality and Limitations](#-data-quality-and-limitations)
 - [Skills Practiced](#-skills-practiced)
 - [Project Structure](#-project-structure)
+- [Future Improvements](#-future-improvements)
 
 ---
 
 ## 🎯 Business Scenario
 
-An online retailer wants to better understand its customers and identify the purchasing behaviors associated with higher customer value.
+An online retailer wants to better understand its customers and identify purchasing behaviors associated with higher customer value.
 
-The business has transaction-level data, but raw transactions alone do not explain which customers contribute the most revenue, how returns affect transaction values, or whether purchasing frequency is associated with customer value.
+The retailer has transaction-level data, but raw transactions alone do not reveal which customers contribute the most transaction value, how negative transactions affect totals, or whether purchasing frequency is associated with customer value.
 
-**Your mission:** Transform raw retail transactions into useful customer-level metrics and evidence-based business insights using SQL.
+**Your mission:** Transform raw retail transactions into customer-level metrics and evidence-based business insights using SQL.
 
 ## 🗂️ Dataset Overview
 
@@ -36,147 +37,180 @@ The business has transaction-level data, but raw transactions alone do not expla
 |---|---|
 | Dataset | Online Retail |
 | Source | [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/352/online+retail) |
-| Original records | 541,909 rows |
+| Raw records | 541,909 rows |
 | Database | Microsoft SQL Server |
 | Raw table | `dbo.OnlineRetail_Raw` |
 | SQL dialect | T-SQL |
 
-The dataset contains retail transaction information, including invoice numbers, products, quantities, prices, invoice dates, customer IDs, and countries.
+The dataset contains retail transaction information, including invoice numbers, product codes and descriptions, quantities, unit prices, invoice dates, customer IDs, and countries.
+
+The raw data was imported into SQL Server with the source columns stored as text. Numeric and date conversions were applied within the analysis queries, leaving the raw table unchanged.
 
 ## 🔎 Business Questions
 
-Use the expandable sections below to explore the questions addressed in this case study.
+Expand each section to explore the analytical questions addressed in this case study.
 
 <details>
 <summary><strong>01 — Data Profiling and Quality</strong></summary>
 
-**Business objective:** Understand the reliability of the raw data before performing analysis.
+**Business objective:** Assess data completeness and conversion reliability before performing customer analysis.
 
 Questions investigated:
 
-- Which columns contain missing values?
-- How many invoice rows are cancellations?
-- How many rows have negative quantities?
+- Which columns contain missing or blank values?
+- How many invoice rows have invoice numbers beginning with `C`?
+- How many rows have negative or zero quantities?
 - Which raw columns require type conversion?
-- Can quantities, prices, and dates be converted successfully?
+- Can quantities, unit prices, and invoice dates be converted successfully?
 
-**SQL file:** `01_data_profiling.sql`
+**SQL file:** [`01_data_profiling.sql`](01_data_profiling.sql)
 
 </details>
 
 <details>
-<summary><strong>02 — Highest-Revenue Customers</strong></summary>
+<summary><strong>02 — Highest-Value Customers</strong></summary>
 
-**Business objective:** Identify the customers contributing the highest net transaction value.
+**Business objective:** Identify customers with the highest calculated net transaction value.
 
 Questions investigated:
 
-- How many unique customers can be identified?
-- Which 10 customers rank highest by net transaction value?
+- How many distinct, identifiable customers are present?
+- Which ten customers rank highest by net transaction value?
 - How do their net quantities compare?
 
-**SQL file:** `02_customer_analysis.sql`
+**SQL file:** [`02_customer_analysis.sql`](02_customer_analysis.sql)
 
 </details>
 
 <details>
 <summary><strong>03 — Gross vs. Net Transaction Value</strong></summary>
 
-**Business objective:** Understand how negative-quantity transactions affect overall transaction value.
+**Business objective:** Quantify the difference between positive-quantity transaction value and transaction value calculated using signed quantities.
 
 Questions investigated:
 
-- What is the transaction value from positive-quantity rows?
-- What is the net transaction value when negative quantities are included?
-- What is the difference between these two measures?
+- What is the transaction value from rows with positive quantities?
+- What is the transaction value when positive and negative quantities are included?
+- What is the difference between these measures?
+- What percentage of the positive-quantity transaction value does this difference represent?
 
-**SQL file:** `02_customer_analysis.sql`
+**SQL file:** [`02_customer_analysis.sql`](02_customer_analysis.sql)
 
 </details>
 
 <details>
 <summary><strong>04 — Customer Purchasing Behavior</strong></summary>
 
-**Business objective:** Compare the purchasing patterns of high-value customers.
+**Business objective:** Compare the purchasing patterns of customers with high calculated net transaction value.
 
 Metrics calculated:
 
 - Total net quantity
 - Total net transaction value
-- Average unit price
+- Average unit price across transaction rows
 - Revenue per net unit
-- Distinct invoice count
-- Average net transaction value per invoice
+- Distinct invoice count, including cancellation invoices
+- Average net transaction value per distinct invoice number
 
-**SQL file:** `02_customer_analysis.sql`
+**SQL file:** [`02_customer_analysis.sql`](02_customer_analysis.sql)
 
 </details>
 
 ## 💻 SQL Solutions
 
-The SQL scripts are organized by analytical task:
+The analysis is organized into two SQL scripts:
 
 | File | Purpose |
 |---|---|
-| [`01_data_profiling.sql`](01_data_profiling.sql) | Data profiling, quality checks, and conversion validation |
-| [`02_customer_analysis.sql`](02_customer_analysis.sql) | Customer aggregation, revenue metrics, and purchasing behavior |
+| [`01_data_profiling.sql`](01_data_profiling.sql) | Data profiling, missing-value checks, conversion diagnostics, and final conversion validation |
+| [`02_customer_analysis.sql`](02_customer_analysis.sql) | Customer-level aggregation, revenue metrics, invoice counts, and purchasing behavior |
 
-The analysis uses common SQL techniques, including `CASE WHEN`, `SUM`, `COUNT(DISTINCT)`, `GROUP BY`, CTEs, `TRY_CAST`, `TRY_CONVERT`, and `TOP`.
+The project applies SQL Server techniques including:
+
+- `CASE WHEN` and conditional aggregation
+- `SUM`, `AVG`, and `COUNT(DISTINCT)`
+- `GROUP BY` and `ORDER BY`
+- Common Table Expressions (CTEs)
+- `TRY_CAST` and `TRY_CONVERT`
+- `REPLACE`, `TRIM`, and `NULLIF`
+- `TOP` and calculated metrics
 
 ## 📊 Key Findings
 
+The findings below are based on the query results obtained during this case study. Customer-level comparisons refer to the ten highest-revenue customers returned by the analysis unless otherwise stated.
+
 ### 1. Customer value and purchasing frequency
 
-Customer **14646** ranked first in both net transaction value and distinct invoice count among the top-revenue customers examined.
+Customer **14646** ranked first in both calculated net transaction value and distinct invoice count among the ten highest-revenue customers examined.
 
-This suggests that purchasing frequency may be associated with customer value. Further analysis is needed to separate its influence from order size and product mix.
+This suggests an association between purchasing frequency and customer value within this group. However, further analysis would be needed to distinguish the contributions of order frequency, order size, and product mix.
+
+**Limitation:** The invoice count includes cancellation invoices, so it is not a count of completed orders.
 
 ### 2. Revenue per net unit
 
 Customer **18102** had a revenue-per-net-unit ratio of **3.99**, the highest among the top three customers examined.
 
-This demonstrates that the customer generating the highest total transaction value does not necessarily have the highest revenue-per-net-unit ratio.
+This illustrates that the customer with the highest total transaction value does not necessarily have the highest revenue-per-net-unit ratio.
+
+Revenue per net unit is calculated as net transaction value divided by net quantity. It is an exploratory ratio, not necessarily the average selling price of an item. Returns, negative quantities, and product mix can affect its interpretation.
 
 ### 3. Gross vs. net transaction value
 
+The analysis produced the following results:
+
 | Metric | Result |
 |---|---:|
-| Gross transaction value | 1,064,456.42 |
+| Positive-quantity transaction value | 1,064,456.42 |
 | Net transaction value | 974,747.93 |
 | Difference | 89,708.49 |
-| Difference as a percentage of gross | 8.43% |
+| Difference as a percentage of positive-quantity transaction value | 8.43% |
 
-Under the definitions used in this analysis, the net transaction value was approximately **8.43% lower** than the positive-quantity transaction value.
+Under the definitions used in this analysis, the net transaction value was approximately **8.43% lower** than the transaction value calculated from positive-quantity rows.
 
-This difference should not be attributed to returns alone: cancellation invoices and other negative-quantity transactions have not yet been isolated and reconciled.
+The difference reflects the impact of including negative transaction values in the net calculation. It should not be attributed to returns alone because cancellation invoices and other negative-quantity transactions have not yet been separately isolated and reconciled.
+
+The values are presented in the dataset's monetary units; the analysis does not independently verify the currency or accounting treatment.
 
 ## 🧹 Data Quality and Limitations
 
-The corrected conversion checks returned zero failed conversions among nonblank values for:
+### Conversion validation
 
-- `Quantity`
-- `UnitPrice`
-- `InvoiceDate`
+The final conversion checks returned zero failed conversions among nonblank values for:
 
-Other considerations remain:
+| Column | Failed conversions |
+|---|---:|
+| `Quantity` | 0 |
+| `UnitPrice` | 0 |
+| `InvoiceDate` | 0 |
 
-- Customer IDs and product descriptions contain missing values.
-- Negative quantities and cancellation invoices require separate analysis.
-- Invoice counts currently include cancellation invoices.
-- Revenue-per-net-unit and average net transaction value per invoice are exploratory metrics, not official accounting measures.
-- Transaction values are calculated as `Quantity × UnitPrice`. Currency and accounting treatment have not been independently verified.
-- The raw dataset is retained separately; these scripts analyze `dbo.OnlineRetail_Raw` without modifying it.
+The conversions used SQL Server's `TRY_CAST` and `TRY_CONVERT`, including decimal-comma normalization for unit prices and date style `103` for the `DD/MM/YYYY` date format.
+
+These results confirm that the tested nonblank values converted successfully. They do not establish that every value is complete or semantically valid.
+
+### Remaining limitations
+
+- Customer IDs and product descriptions contain missing or blank values.
+- Negative quantities and cancellation invoice rows require separate analysis.
+- Distinct invoice counts include cancellation invoices and should not be interpreted as completed-order counts.
+- Average net transaction value per invoice is an exploratory ratio, not a definitive average order value.
+- Revenue per net unit can be distorted by returns, negative quantities, and product mix.
+- Transaction value is calculated as `Quantity × UnitPrice`. Discounts, shipping charges, taxes, refunds, and other accounting adjustments have not been independently reconciled.
+- `SUM` ignores `NULL` expressions. Although conversion failures were checked, missing values and their effect on individual metrics must still be considered.
+- The analysis uses the raw table without modifying it.
 
 ## 🧠 Skills Practiced
 
 - Data profiling and quality validation
 - Data type conversion and error handling
-- Conditional aggregation with `CASE WHEN`
+- Conditional aggregation using `CASE WHEN`
 - Customer-level aggregation with `GROUP BY`
 - Common Table Expressions (CTEs)
 - Distinct counts and customer ranking
-- Revenue calculations and percentage comparisons
-- Translating SQL results into business insights
+- Transaction-value calculations
+- Gross-versus-net comparisons
+- Percentage calculations and decimal arithmetic
+- Interpreting results and documenting analytical limitations
 
 ## 🗃️ Project Structure
 
@@ -189,12 +223,18 @@ Other considerations remain:
     └── 02_customer_analysis.sql
 ```
 
-## 🚀 Next Steps
+The root README provides the roadmap for the full eight-week challenge. Each weekly folder contains its own case-study documentation and SQL scripts.
 
-- [ ] Refine cancellation and return handling.
-- [ ] Validate customer revenue calculations against transaction-level records.
-- [ ] Continue to Week 2: a new business case and additional SQL techniques.
+## 🚀 Future Improvements
+
+The core Week 1 analysis is complete. Potential extensions include:
+
+- [ ] Separate cancellation invoices from other negative-quantity transactions.
+- [ ] Reconcile returns and cancellations with their original transactions.
+- [ ] Validate customer-level metrics against transaction-level records.
+- [ ] Refine order-count and average-revenue-per-order definitions.
+- [ ] Continue to Week 2 with a new business case and additional SQL techniques.
 
 ---
 
-*Part of an original, self-directed 8-week SQL portfolio challenge using Microsoft SQL Server and real-world datasets.*
+*Part of an original, self-directed eight-week SQL portfolio challenge using Microsoft SQL Server and real-world datasets.*

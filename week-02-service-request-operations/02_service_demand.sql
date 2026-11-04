@@ -80,9 +80,13 @@ KEY FINDINGS:
 
 BUSINESS INSIGHT:
 
-Service demand is concentrated in residential noise and
-heating/hot water complaints. These categories represent
-the largest areas of reported service needs in January 2025.
+Residential noise and HEAT/HOT WATER complaints represent
+the largest sources of reported service demand, together
+accounting for 39.65% of all requests.
+
+This concentration suggests that these service categories
+are important areas for operational planning and resource
+allocation.
 */
 
 
@@ -121,12 +125,12 @@ KEY FINDINGS:
 
 BUSINESS INSIGHT:
 
-Service demand is geographically concentrated in the
-Bronx and Brooklyn, which together account for nearly
-60% of all requests.
+The Bronx and Brooklyn account for 59.74% of all recorded
+service requests, indicating a strong geographic
+concentration of reported demand.
 
-This distribution may help identify areas requiring
-greater operational attention.
+However, request volume alone does not establish which
+borough has the highest demand relative to its population.
 */
 
 
@@ -167,14 +171,14 @@ KEY FINDINGS:
 
 BUSINESS INSIGHT:
 
-Service request demand is highly concentrated in NYPD
-and HPD, which together handle approximately three
-quarters of all requests.
+NYPD and HPD account for 75.76% of all recorded service
+requests, demonstrating a high concentration of workload
+among these two agencies.
 
-This concentration highlights the importance of these
-two agencies in NYC's 311 service operations.
+This concentration may be relevant when evaluating
+operational responsibilities and resource allocation.
 
-Note: Workload volume measures the number of requests
+Note: Request volume measures the number of records
 assigned to each agency. It does not necessarily indicate
-operational efficiency, resource availability, or service quality.
-*/
+operational efficiency, resource availability, or service
+quality.

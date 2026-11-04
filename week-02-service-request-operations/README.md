@@ -1,24 +1,24 @@
 # Week 2 — NYC 311 Service Request Operations & Performance
 
-## Project Overview
+## 1. Project Overview
 
 This project analyzes New York City's 311 service requests to understand service demand, geographic distribution, agency workload, and resolution performance.
 
 Using publicly available data from NYC Open Data, the analysis explores how service requests are distributed across complaint categories, boroughs, and agencies, while evaluating resolution times and data-quality limitations.
 
-The project was developed using **Microsoft SQL Server** and focuses on translating operational data into actionable business insights.
+The project was developed using **Microsoft SQL Server**, focusing on translating operational data into actionable business insights.
 
-## Business Scenario
+## 2. Business Scenario
 
 A municipal operations department wants to understand the demand for public services and evaluate how effectively service requests are being resolved.
 
-The analysis aims to answer three main questions:
+The analysis addresses three main business questions:
 
 1. Which complaint categories and boroughs generate the highest service demand?
 2. How is the service request workload distributed across agencies?
 3. How long do agencies take to resolve requests, and what data-quality issues affect performance measurement?
 
-## Dataset
+## 3. Dataset
 
 **Source:** NYC Open Data — 311 Service Requests from 2020 to Present
 
@@ -30,89 +30,86 @@ The analysis aims to answer three main questions:
 | Extraction period | January 1–31, 2025 |
 | Extraction method | Socrata API |
 | Imported records | 348,180 |
-| Database | SQL Server |
+| Database | Microsoft SQL Server |
 | Raw table | `dbo.NYC_311_Raw` |
+| Analysis environment | SQL Server Management Studio |
 
 ### Selected fields
 
-- `UniqueKey`: Unique identifier for each service request.
-- `CreatedDate`: Date and time when the request was created.
-- `ClosedDate`: Date and time when the request was closed.
-- `Agency`: Agency responsible for handling the request.
-- `ComplaintType`: Type of reported complaint.
-- `Descriptor`: Additional description of the complaint.
-- `Status`: Current request status.
-- `Borough`: Geographic area associated with the request.
+| Column | Description |
+|---|---|
+| UniqueKey | Unique service request identifier |
+| CreatedDate | Date and time when the request was created |
+| ClosedDate | Date and time when the request was closed |
+| Agency | Agency responsible for the request |
+| ComplaintType | Type of reported problem |
+| Descriptor | More specific description of the problem |
+| Status | Current request status |
+| Borough | NYC borough associated with the request |
 
-The raw dataset was retained in SQL Server, while date conversion and analytical filtering were performed within the SQL queries.
+## 4. Analysis Structure
 
-## Analytical Approach
+The project is organized into three SQL files.
 
-### Part 1 — Data Profiling & Validation
+| File | Purpose |
+|---|---|
+| `01_data_profiling.sql` | Data quality, missing values, duplicate identifiers, date validation and chronological inconsistencies |
+| `02_service_demand.sql` | Complaint category, geographic demand and agency workload analysis |
+| `03_resolution_performance.sql` | Average and median resolution times, unresolved requests and agency-level performance |
 
-**Objective:** Assess data completeness, uniqueness, and date consistency before conducting the analysis.
+## 5. Key Findings
 
-Key checks:
+### 5.1 Data Quality and Validation
 
-- Missing and blank values.
-- Duplicate request identifiers.
-- Date conversion failures.
-- Missing closure dates.
-- Chronological inconsistencies between creation and closure dates.
+A total of **348,180 records** were imported into SQL Server.
 
-**Key findings:**
-
-| Data quality check | Result |
+| Validation metric | Result |
 |---|---:|
 | Total records | 348,180 |
+| Missing UniqueKey | 0 |
+| Missing CreatedDate | 0 |
+| Missing ClosedDate | 2,593 |
+| Missing ComplaintType | 0 |
+| Missing Descriptor | 1,539 |
 | Duplicate request identifiers | 0 |
-| Missing creation dates | 0 |
-| Missing closure dates | 2,593 |
-| Missing complaint descriptions | 1,539 |
-| Invalid creation date conversions | 0 |
-| Invalid closure date conversions | 0 |
+
+Date validation identified the following results:
+
+| Date validation metric | Records |
+|---|---:|
+| Valid creation and closure date pairs | 345,587 |
 | Negative resolution durations | 99 |
+| Zero-second resolution durations | 3,601 |
+| Positive resolution durations | 341,887 |
 
-The analysis identified 99 requests with closure dates earlier than their creation dates.
+Negative and zero-second durations were excluded from the positive resolution-time calculations.
 
-These records were excluded from positive resolution-duration calculations.
-
-### Part 2 — Service Demand Analysis
-
-**Objective:** Identify the main sources of service demand and understand how requests are distributed across geographic areas and agencies.
-
-Business questions:
-
-1. Which complaint categories generate the highest number of service requests?
-2. Which boroughs generate the highest service demand?
-3. Which agencies handle the largest number of requests?
-
-**Key findings:**
+### 5.2 Service Demand Analysis
 
 **Complaint categories**
 
-| Rank | Complaint category | Requests | Demand share |
-|---:|---|---:|---:|
-| 1 | Noise - Residential | 70,837 | 20.34% |
-| 2 | HEAT/HOT WATER | 67,229 | 19.31% |
-| 3 | Illegal Parking | 43,139 | 12.39% |
-| 4 | Blocked Driveway | 14,661 | 4.21% |
-| 5 | UNSANITARY CONDITION | 10,000 | 2.87% |
+The three categories generating the highest request volumes were:
 
-The three largest complaint categories account for approximately 52% of all requests.
+| Complaint category | Requests | Demand share |
+|---|---:|---:|
+| Noise - Residential | 70,837 | 20.34% |
+| HEAT/HOT WATER | 67,229 | 19.31% |
+| Illegal Parking | 43,139 | 12.39% |
+
+These three categories account for a substantial proportion of the service request volume.
 
 **Geographic distribution**
 
 | Borough | Requests | Demand share |
 |---|---:|---:|
-| BRONX | 115,111 | 33.06% |
-| BROOKLYN | 92,911 | 26.68% |
-| QUEENS | 68,525 | 19.68% |
-| MANHATTAN | 61,331 | 17.61% |
-| STATEN ISLAND | 10,125 | 2.91% |
+| Bronx | 115,111 | 33.06% |
+| Brooklyn | 92,911 | 26.68% |
+| Queens | 68,525 | 19.68% |
+| Manhattan | 61,331 | 17.61% |
+| Staten Island | 10,125 | 2.91% |
 | Unspecified | 177 | 0.05% |
 
-The Bronx and Brooklyn together account for approximately 59.74% of requests.
+The Bronx and Brooklyn together account for approximately 59.74% of all requests.
 
 **Agency workload**
 
@@ -124,76 +121,63 @@ The Bronx and Brooklyn together account for approximately 59.74% of requests.
 | DOT | 16,592 | 4.77% |
 | DEP | 15,358 | 4.41% |
 
-NYPD and HPD together handle approximately 75.76% of the recorded service request volume.
+NYPD and HPD handle approximately 75.76% of the requests in this dataset, indicating a highly concentrated distribution of operational workload.
 
-### Part 3 — Resolution Performance
+### 5.3 Resolution Performance
 
-**Objective:** Evaluate resolution durations, identify requests with missing closure information, and compare resolution times across agencies.
+The analysis identified **341,887 requests with positive resolution durations**.
 
-Business questions:
-
-1. How long does it take to resolve service requests?
-2. How many requests have missing closure dates, and how are they distributed by status?
-3. Which agencies have the longest average and median resolution times?
-
-**Overall resolution time**
-
-| Metric | Result |
+| Performance metric | Result |
 |---|---:|
-| Valid positive resolution durations | 341,887 |
+| Valid resolved requests | 341,887 |
 | Average resolution time | 242.21 hours |
 | Median resolution time | 15.65 hours |
 
-The average resolution time is approximately 15.5 times higher than the median.
+The difference between the average and median suggests a highly skewed distribution of resolution times, where a smaller number of long-running requests may substantially increase the average.
 
-This indicates a strongly right-skewed distribution, suggesting that a relatively small number of long-running requests substantially increase the average.
+The median therefore provides an additional perspective on typical resolution performance.
 
-**Closure-date completeness by status**
+### 5.4 Unresolved Requests and Data Limitations
 
-| Status | Total requests | Missing closure dates | Missing closure % |
-|---|---:|---:|---:|
-| In Progress | 858 | 857 | 99.88% |
-| Open | 399 | 341 | 85.46% |
-| Assigned | 263 | 184 | 69.96% |
-| Pending | 183 | 85 | 46.45% |
-| Started | 78 | 74 | 94.87% |
-| Unspecified | 36 | 1 | 2.78% |
-| Closed | 346,363 | 1,051 | 0.30% |
+Missing closure dates were not distributed equally across request statuses.
 
-The analysis identified inconsistencies between request status and closure-date availability.
+For example:
 
-For example, 1,051 requests marked as Closed have no closure date, while 275 requests with a non-closed status already have a closure date.
+- 99.88% of requests with status `In Progress` had no closure date.
+- 85.46% of requests with status `Open` had no closure date.
+- 0.30% of requests with status `Closed` had no closure date.
 
-Therefore, missing closure dates cannot automatically be interpreted as unresolved requests.
+This demonstrates why request status and closure-date completeness should be evaluated together.
 
-**Agency resolution performance**
+A missing closure date does not automatically mean that a request is unresolved. The status field provides important additional context.
 
-The results identified substantial differences in resolution times across agencies.
+## 6. SQL Skills Demonstrated
 
-Examples from the analysis:
+- Data profiling and quality validation
+- NULL and blank-value handling
+- Duplicate identification
+- Data type conversion using `TRY_CONVERT`
+- Conditional aggregation using `CASE WHEN`
+- Common Table Expressions (CTEs)
+- Grouping and ranking
+- Window functions
+- `DATEDIFF` and date calculations
+- `PERCENTILE_CONT` for median calculation
+- Business-oriented interpretation of operational data
 
-- EDC presented the longest average and median resolution times among the agencies shown.
-- DOB had a considerably higher average than median, suggesting a concentration of long-running requests.
-- HPD handled the largest number of valid resolved requests among the agencies shown.
+## 7. Data Quality Considerations
 
-These differences should not be interpreted as direct measures of agency efficiency because agencies handle different complaint categories, operational responsibilities, and levels of complexity.
+The analysis includes several important limitations:
 
-## SQL Skills Demonstrated
+1. Records with missing closure dates cannot be included in completed-request resolution-time calculations.
+2. Negative resolution durations may indicate inconsistencies in the source timestamps and were excluded from positive-duration analysis.
+3. Zero-second durations may result from the precision of the `DATEDIFF(SECOND, ...)` calculation.
+4. The average resolution time is sensitive to unusually long resolution durations.
+5. Agency workload comparisons do not independently measure agency efficiency or service quality.
 
-- Data profiling and quality validation.
-- `TRY_CONVERT()` and `NULLIF()` for data cleaning.
-- `TRIM()` for whitespace handling.
-- `CASE WHEN` for conditional aggregation.
-- `GROUP BY` and `HAVING`.
-- Common Table Expressions (CTEs).
-- `COUNT()`, `SUM()`, and `AVG()`.
-- `DATEDIFF()` for resolution-time calculations.
-- `PERCENTILE_CONT()` for median calculations.
-- Window functions with `PARTITION BY`.
-- Joining aggregated results.
-- Percentage calculations and ranking.
+These limitations should be considered when interpreting the results.
 
-## Repository Structure
+## 8. Repository Structure
 
 ```text
 week-02-service-request-operations/
@@ -202,27 +186,3 @@ week-02-service-request-operations/
 ├── 01_data_profiling.sql
 ├── 02_service_demand.sql
 └── 03_resolution_performance.sql
-```
-
-## Limitations
-
-- The analysis covers requests created during January 2025 only.
-- The dataset is a snapshot extracted from a public source and may be updated or revised.
-- Requests without valid positive resolution durations were excluded from resolution-time calculations.
-- Agency comparisons do not account for differences in complaint complexity or service-level targets.
-- Missing closure dates do not necessarily indicate unresolved requests.
-- Resolution duration is not, by itself, a complete measure of operational efficiency.
-
-## Conclusion
-
-This project demonstrates how SQL can be used to transform a large operational dataset into structured business insights.
-
-The analysis identified the main sources of service demand, highlighted geographic and agency workload concentration, measured resolution-time distributions, and uncovered inconsistencies in request status and closure-date information.
-
-The findings illustrate the importance of combining business analysis with data-quality validation before drawing conclusions from operational performance metrics.
-
----
-
-**Tools:** Microsoft SQL Server, SQL Server Management Studio, Python (`requests`), NYC Open Data API
-
-**Project:** 8-Week SQL Challenge — Week 2

@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-This project analyzes New York City's 311 service requests to understand service demand, geographic distribution, agency workload, and resolution performance.
+This project analyzes New York City's 311 service requests to understand service demand, geographic distribution, agency workload, and resolution patterns.
 
 Using publicly available data from NYC Open Data, the analysis explores how service requests are distributed across complaint categories, boroughs, and agencies, while evaluating resolution times and data-quality limitations.
 
@@ -10,13 +10,13 @@ The project was developed using **Microsoft SQL Server**, focusing on translatin
 
 ## 2. Business Scenario
 
-A municipal operations department wants to understand the demand for public services and evaluate how effectively service requests are being resolved.
+A municipal operations department wants to understand demand for public services, how operational workload is distributed, and how service request resolution patterns vary.
 
 The analysis addresses three main business questions:
 
 1. Which complaint categories and boroughs generate the highest service demand?
 2. How is the service request workload distributed across agencies?
-3. How long do agencies take to resolve requests, and what data-quality issues affect performance measurement?
+3. How long do service requests take to resolve, and what data-quality issues affect resolution-time analysis?
 
 ## 3. Dataset
 
@@ -53,9 +53,9 @@ The project is organized into three SQL files.
 
 | File | Purpose |
 |---|---|
-| `01_data_profiling.sql` | Data quality, missing values, duplicate identifiers, date validation and chronological inconsistencies |
-| `02_service_demand.sql` | Complaint category, geographic demand and agency workload analysis |
-| `03_resolution_performance.sql` | Average and median resolution times, unresolved requests and agency-level performance |
+| `01_data_profiling.sql` | Data quality, missing values, duplicate identifiers, date validation, and chronological inconsistencies |
+| `02_service_demand.sql` | Complaint category, geographic demand, and agency workload analysis |
+| `03_resolution_performance.sql` | Request status and closure completeness, overall resolution times, and agency-level resolution comparisons |
 
 ## 5. Key Findings
 
@@ -82,7 +82,7 @@ Date validation identified the following results:
 | Zero-second resolution durations | 3,601 |
 | Positive resolution durations | 341,887 |
 
-Negative and zero-second durations were excluded from the positive resolution-time calculations.
+Negative and zero-second durations were excluded from positive resolution-time calculations.
 
 ### 5.2 Service Demand Analysis
 
@@ -96,7 +96,7 @@ The three categories generating the highest request volumes were:
 | HEAT/HOT WATER | 67,229 | 19.31% |
 | Illegal Parking | 43,139 | 12.39% |
 
-These three categories account for a substantial proportion of the service request volume.
+These three categories account for approximately **52.04% of all service requests**, indicating that demand is concentrated in a relatively small number of complaint categories.
 
 **Geographic distribution**
 
@@ -109,7 +109,7 @@ These three categories account for a substantial proportion of the service reque
 | Staten Island | 10,125 | 2.91% |
 | Unspecified | 177 | 0.05% |
 
-The Bronx and Brooklyn together account for approximately 59.74% of all requests.
+The Bronx and Brooklyn together account for approximately **59.74% of all requests**.
 
 **Agency workload**
 
@@ -121,7 +121,7 @@ The Bronx and Brooklyn together account for approximately 59.74% of all requests
 | DOT | 16,592 | 4.77% |
 | DEP | 15,358 | 4.41% |
 
-NYPD and HPD handle approximately 75.76% of the requests in this dataset, indicating a highly concentrated distribution of operational workload.
+NYPD and HPD handle approximately **75.76% of the requests** in this dataset, indicating a highly concentrated distribution of operational workload.
 
 ### 5.3 Resolution Performance
 
@@ -133,11 +133,11 @@ The analysis identified **341,887 requests with positive resolution durations**.
 | Average resolution time | 242.21 hours |
 | Median resolution time | 15.65 hours |
 
-The difference between the average and median suggests a highly skewed distribution of resolution times, where a smaller number of long-running requests may substantially increase the average.
+The average resolution time is substantially higher than the median. This suggests a right-skewed distribution in which a smaller number of long-running requests may substantially increase the overall average.
 
-The median therefore provides an additional perspective on typical resolution performance.
+The median therefore provides an additional perspective on the typical resolution duration and complements the average when evaluating resolution patterns.
 
-### 5.4 Unresolved Requests and Data Limitations
+### 5.4 Request Status and Closure Completeness
 
 Missing closure dates were not distributed equally across request statuses.
 
@@ -149,7 +149,7 @@ For example:
 
 This demonstrates why request status and closure-date completeness should be evaluated together.
 
-A missing closure date does not automatically mean that a request is unresolved. The status field provides important additional context.
+A missing closure date does not automatically mean that a request is unresolved. The status field provides important additional context, and inconsistencies between these fields should be considered when interpreting the results.
 
 ## 6. SQL Skills Demonstrated
 
@@ -165,17 +165,16 @@ A missing closure date does not automatically mean that a request is unresolved.
 - `PERCENTILE_CONT` for median calculation
 - Business-oriented interpretation of operational data
 
-## 7. Data Quality Considerations
+## 7. Data Quality Considerations and Limitations
 
 The analysis includes several important limitations:
 
 1. Records with missing closure dates cannot be included in completed-request resolution-time calculations.
 2. Negative resolution durations may indicate inconsistencies in the source timestamps and were excluded from positive-duration analysis.
-3. Zero-second durations may result from the precision of the `DATEDIFF(SECOND, ...)` calculation.
-4. The average resolution time is sensitive to unusually long resolution durations.
-5. Agency workload comparisons do not independently measure agency efficiency or service quality.
-
-These limitations should be considered when interpreting the results.
+3. Zero-second durations may result from the precision of the `DATEDIFF(SECOND, ...)` calculation, which counts second boundaries rather than measuring exact elapsed time.
+4. The average resolution time is sensitive to unusually long resolution durations, making the median an important complementary metric.
+5. Agency workload comparisons do not independently measure agency efficiency or service quality because differences in request complexity, responsibilities, and service targets are not accounted for.
+6. Resolution-time calculations include only requests with valid creation and closure dates available in the extracted dataset. Requests without valid closure dates are excluded, so the results should not be interpreted as the eventual resolution times of every request created during January 2025.
 
 ## 8. Repository Structure
 
@@ -186,3 +185,4 @@ week-02-service-request-operations/
 ├── 01_data_profiling.sql
 ├── 02_service_demand.sql
 └── 03_resolution_performance.sql
+```

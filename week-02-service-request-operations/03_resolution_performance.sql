@@ -271,8 +271,16 @@ considered before drawing performance conclusions.
 
 METHODOLOGICAL LIMITATION:
 
-The analysis compares resolution durations for requests
-created in January 2025 that have valid closure dates.
-It does not account for differences in request complexity
-or agency-specific service targets.
+The analysis evaluates resolution durations for January 2025
+requests with valid creation and closure dates available in
+the extracted dataset.
+
+Requests without a valid closure date and requests with
+negative resolution durations are excluded from duration
+calculations.
+
+The analysis does not account for differences in request
+complexity or agency-specific service targets. Therefore,
+resolution times should not be interpreted as a direct
+measure of agency efficiency.
 */

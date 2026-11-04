@@ -10,13 +10,9 @@ ENVIRONMENT: Microsoft SQL Server
 
 BUSINESS CONTEXT
 
-Following the service demand analysis, this section
-evaluates how efficiently NYC agencies resolve service
-requests.
-
-The objective is to understand resolution times,
-identify requests that remain unresolved, and compare
-resolution performance across agencies.
+This section evaluates resolution times, 
+identifies requests that remain open, 
+and compares resolution patterns across agencies.
 
 =============================================================
 ANALYTICAL OBJECTIVES
@@ -136,9 +132,9 @@ longer resolution times are concentrated.
 
 
 -- ===========================================================
--- Q2. UNRESOLVED SERVICE REQUESTS
--- How many service requests remain unresolved?
--- Analyze requests by status.
+-- Q2. SERVICE REQUEST STATUS & CLOSURE COMPLETENESS
+-- How are service requests distributed by status?
+-- How often is the closure date missing within each status?
 -- ===========================================================
 WITH Num_Request_Unresolved AS (	
 	SELECT
@@ -193,3 +189,90 @@ administrative practices, or incomplete records.
 -- Which agencies have the longest resolution times?
 -- Compare average and median resolution times.
 -- ===========================================================
+WITH Date_Convertion AS (
+SELECT
+	Agency,
+	TRY_CONVERT (DATETIME2,NULLIF(TRIM(CreatedDate), '')) AS Created_Date,
+	TRY_CONVERT	(DATETIME2,NULLIF(TRIM(ClosedDate), '')) AS Closed_Date
+FROM dbo.NYC_311_Raw
+),
+
+Duration_hours AS (
+SELECT
+	Agency,
+	Created_Date,
+	Closed_Date,
+	DATEDIFF (SECOND,Created_Date,Closed_Date)/3600.0 AS Duration_Hours
+FROM Date_Convertion
+WHERE Created_Date IS NOT NULL
+      AND Closed_Date IS NOT NULL
+      AND Closed_Date > Created_Date
+),
+
+Median_Calculation AS (
+SELECT
+	Agency,
+	MAX(Median_Resolution_Hours) AS Median_Resolution_Hours
+FROM (
+	SELECT
+		Agency,
+		PERCENTILE_CONT(0.5)
+		WITHIN GROUP (
+			ORDER BY Duration_Hours
+			) OVER (PARTITION BY Agency) AS Median_Resolution_Hours
+		FROM Duration_hours
+	) AS Median_Values
+GROUP BY Agency
+),
+
+Average_Calculation AS (
+SELECT
+	Agency,
+	COUNT (*) AS Valid_Resolved_Requests,
+	AVG (Duration_Hours) AS Resolution_Average
+FROM Duration_hours
+GROUP BY Agency
+)
+
+SELECT
+	a.Agency,
+	a.Valid_Resolved_Requests,
+	CAST(a.Resolution_Average AS DECIMAL(10,2)) AS Average_Resolution_Hours,
+    CAST(m.Median_Resolution_Hours AS DECIMAL(10,2)) AS Median_Resolution_Hours
+FROM Median_Calculation AS m
+INNER JOIN Average_Calculation AS a
+	ON m.Agency = a.Agency
+ORDER BY Resolution_Average DESC;
+/*
+KEY FINDINGS:
+
+1. EDC presents the longest average and median resolution
+   times among the agencies analyzed.
+
+2. DOB shows a substantial difference between its average
+   and median resolution times, suggesting a right-skewed
+   distribution.
+
+3. HPD handles the largest volume of valid resolved
+   requests among the agencies shown.
+
+BUSINESS INSIGHT:
+
+Resolution performance varies considerably across agencies.
+
+The difference between average and median resolution times
+suggests that some agencies experience a concentration of
+particularly long-running requests.
+
+However, resolution time alone does not establish agency
+efficiency. Differences in complaint complexity, service
+responsibilities and operational processes should be
+considered before drawing performance conclusions.
+
+METHODOLOGICAL LIMITATION:
+
+The analysis compares resolution durations for requests
+created in January 2025 that have valid closure dates.
+It does not account for differences in request complexity
+or agency-specific service targets.
+*/

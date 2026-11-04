@@ -378,3 +378,19 @@ FROM Date_Validation
 WHERE Resolution_Minutes < 0
 GROUP BY Agency
 ORDER BY Invalid_Requests DESC;
+
+/*
+DATE VALIDATION FINDINGS:
+
+Total records: 348,180
+Valid creation and closure date pairs: 345,587
+Negative resolution durations: 99
+Zero-second resolution durations: 3,601
+Positive resolution durations: 341,887
+
+Negative and zero-second durations were excluded from
+positive resolution-time calculations.
+
+The resulting 341,887 records were used in the overall
+resolution-time analysis.
+*/

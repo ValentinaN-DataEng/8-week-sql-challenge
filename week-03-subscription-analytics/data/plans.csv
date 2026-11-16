@@ -1,0 +1,8 @@
+plan_id,plan_name,billing_frequency,price
+0,Free Trial,Trial,0.0
+1,Basic,Monthly,8.99
+2,Basic,Annual,89.99
+3,Premium,Monthly,12.99
+4,Premium,Annual,119.99
+5,Family,Monthly,19.99
+6,Family,Annual,179.99

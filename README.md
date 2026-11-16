@@ -1,12 +1,12 @@
 # 🧠 8-Week SQL Challenge
 
-> A business-driven SQL portfolio exploring real-world datasets through data analysis, problem-solving, and actionable insights.
+> A business-driven SQL portfolio exploring real-world and synthetic datasets through data analysis, problem-solving, and actionable insights.
 
 [![SQL Server](https://img.shields.io/badge/SQL%20Server-T--SQL-CC2927?logo=microsoftsqlserver&logoColor=white)](https://learn.microsoft.com/en-us/sql/sql-server/)
 ![Case Studies](https://img.shields.io/badge/Case%20Studies-8-blue)
-![Progress](https://img.shields.io/badge/Progress-2%2F8%20Weeks-orange)
+![Progress](https://img.shields.io/badge/Progress-3%2F8%20Weeks-orange)
 
-Welcome! This repository documents my **8-week SQL challenge**, where I solve original business cases using Microsoft SQL Server and real-world datasets.
+Welcome! This repository documents my **8-week SQL challenge**, where I solve original business cases using Microsoft SQL Server, real-world datasets, and synthetic data.
 
 Rather than focusing only on SQL syntax, each case study follows a business-driven analytical workflow: understanding the problem, profiling the data, developing queries, validating results, and communicating meaningful findings.
 
@@ -27,7 +27,7 @@ The goal is to strengthen my SQL skills while developing the analytical thinking
 |---|---|---|---|
 | [01](./week-01-customer-analytics/) | Customer Analytics | Data profiling, transaction analysis, customer revenue, purchasing behavior | ✅ Completed |
 | [02](./week-02-service-request-operations/) | NYC 311 Service Request Operations & Performance | Data quality, service demand, geographic analysis, window functions, resolution times | ✅ Completed |
-| 03 | To be announced | Joins and relational analysis | 🔜 Planned |
+| [03](./week-03-subscription-analytics/) | StreamFlow Subscription Analytics & Customer Lifecycle | Subscription conversion, churn, plan transitions, retention, payment generation, revenue analysis | ✅ Completed |
 | 04 | To be announced | CTEs, subqueries, and analytical logic | 🔜 Planned |
 | 05 | To be announced | Advanced window functions and ranking | 🔜 Planned |
 | 06 | To be announced | Customer segmentation and performance analysis | 🔜 Planned |
@@ -88,12 +88,49 @@ Using the Socrata API, I extracted **348,180 service request records** for Janua
 
 ---
 
+### Week 3 — StreamFlow Subscription Analytics & Customer Lifecycle
+
+**Business question:** How effectively does a subscription business convert trial users, retain customers, manage subscription changes, and generate revenue?
+
+**Dataset:** Synthetic subscription data generated using Python and pandas.
+
+The project simulates a digital audio streaming company with 1,000 customers, seven subscription plans, 1,150 subscription lifecycles, and 3,000 subscription events.
+
+Using SQL Server, I analyzed customer acquisition, trial conversion, subscription churn, plan transitions, retention, and simulated revenue. I also generated a payment history using SQL based on defined subscription billing rules.
+
+**Key activities:**
+- Generated and imported synthetic datasets using Python and pandas.
+- Designed relational tables with primary keys, foreign keys, and constraints.
+- Profiled source data and validated referential integrity.
+- Analyzed monthly customer acquisition and cohort conversion.
+- Calculated trial-to-paid conversion and subscription churn.
+- Used window functions to identify plan transitions and historical subscription states.
+- Evaluated repeat subscription lifecycles and 90-day retention.
+- Generated recurring payment records and analyzed revenue by plan and billing frequency.
+
+**Key findings:**
+- Trial-to-paid conversion reached **94.87%**, representing 1,091 converted subscription lifecycles.
+- Lifecycle churn was **31.39%**, based on 361 ended subscriptions.
+- **15%** of customers had multiple subscription lifecycles.
+- 90-day lifecycle retention reached **90.32%**.
+- Monthly-to-annual billing transitions accounted for **95 events**.
+- Total simulated revenue reached **$180,144.09** across 6,191 payment records.
+- Family Annual generated the highest revenue, contributing **$49,317.26**.
+
+**Key takeaway:** Subscription analytics requires connecting customer behavior, lifecycle events, billing rules, and revenue metrics. The case study also highlights the importance of documenting assumptions and data limitations when working with synthetic business data.
+
+📂 **[Explore Week 3 — StreamFlow Subscription Analytics & Customer Lifecycle](./week-03-subscription-analytics/)**
+
+---
+
 ## 🛠️ Tools & Techniques
 
 **Database and development environment**
 - Microsoft SQL Server
 - SQL Server Management Studio (SSMS)
-- Python and Socrata API for data extraction
+- Python and pandas
+- Socrata API for public data extraction
+- Git and GitHub
 
 **SQL techniques practiced**
 - Data profiling and quality validation
@@ -104,9 +141,11 @@ Using the Socrata API, I extracted **348,180 service request records** for Janua
 - Common Table Expressions (CTEs)
 - Data type conversion using `TRY_CAST` and `TRY_CONVERT`
 - NULL and blank-value handling
-- Date calculations using `DATEDIFF`
-- Window functions and ranking
+- Date calculations using `DATEDIFF` and `DATEADD`
+- Window functions: `ROW_NUMBER()` and `LAG()`
 - Median calculation using `PERCENTILE_CONT`
+- Subqueries and `CROSS APPLY`
+- Iterative processing using `WHILE` loops
 - Percentage calculations and analytical metrics
 
 Additional SQL techniques and tools will be introduced as the challenge progresses.
@@ -131,16 +170,33 @@ Each case study follows a consistent process:
 │
 ├── week-01-customer-analytics/
 │   ├── README.md
-│   ├── 01_data_profiling.sql
-│   └── 02_customer_analysis.sql
+│   └── SQL scripts
 │
 ├── week-02-service-request-operations/
 │   ├── README.md
-│   ├── 01_data_profiling.sql
-│   ├── 02_service_demand.sql
-│   └── 03_resolution_performance.sql
+│   └── SQL scripts
 │
-├── week-03/
+├── week-03-subscription-analytics/
+│   ├── README.md
+│   ├── data/
+│   │   ├── README
+│   │   ├── customers.csv
+│   │   ├── plans.csv
+│   │   ├── subscription_events.csv
+│   │   └── subscriptions.csv
+│   ├── python/
+│   │   └── generate_data.py
+│   └── sql/
+│       ├── README
+│       ├── 00_database_setup.sql
+│       ├── 01_data_validation.sql
+│       ├── 02_customer_acquisition.sql
+│       ├── 03_subscription_conversion_and_churn.sql
+│       ├── 04_plan_analysis_and_transitions.sql
+│       ├── 05_customer_lifecycle_and_retention.sql
+│       ├── 06_payments_generation.sql
+│       └── 07_revenue_analysis.sql
+│
 ├── week-04/
 ├── week-05/
 ├── week-06/
@@ -154,7 +210,9 @@ Future week folders will be added as their case studies are completed.
 
 This is an original, self-directed SQL portfolio challenge created to strengthen my practical data analytics skills.
 
-The case studies use business-oriented questions and publicly available datasets wherever appropriate. Each project is developed independently, with an emphasis on analytical reasoning, data validation, and communicating findings.
+The case studies use business-oriented questions and publicly available datasets wherever appropriate. Synthetic data is also used when a business scenario requires a controlled dataset to explore specific analytical concepts.
+
+Each project is developed independently, with an emphasis on analytical reasoning, data validation, and communicating findings.
 
 The challenge is inspired by the broader practice of SQL case-study challenges, while its scenarios, queries, and analytical work are developed independently.
 
